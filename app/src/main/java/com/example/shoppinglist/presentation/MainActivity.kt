@@ -20,24 +20,7 @@ class MainActivity : AppCompatActivity() {
         llShopList = findViewById(R.id.ll_shop_list)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
-            showList(it)
-        }
-    }
 
-    private fun showList(list: List<ShopItem>) {
-        llShopList.removeAllViews()
-        for (shopItem in list) {
-            val itemView =
-                LayoutInflater.from(this).inflate(getLayoutId(shopItem), llShopList, false)
-            val tvName = itemView.findViewById<TextView>(R.id.tv_name)
-            val tvCount = itemView.findViewById<TextView>(R.id.tv_count)
-            tvName.text = shopItem.name
-            tvCount.text = shopItem.count.toString()
-            itemView.setOnLongClickListener() {
-                viewModel.editShopItem(shopItem)
-                true
-            }
-            llShopList.addView(itemView)
         }
     }
 
