@@ -21,6 +21,9 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         val shopItem = list[position]
         holder.rvCount.text = shopItem.count.toString()
         holder.rvName.text = shopItem.name
+        holder.itemView.setOnLongClickListener() {
+            true
+        }
     }
 
     override fun getItemCount(): Int {
