@@ -41,13 +41,13 @@ class ShopItemViewModel : ViewModel() {
 
         if (validateInput(name, count)) {
             addShopItemUseCase.addShopItem(ShopItem(name, count, true))
+            finishWork()
         }
-        finishWork()
     }
 
-    private val _editShopItemFinished = MutableLiveData<Boolean>()
-    val editShopItemFinished: LiveData<Boolean>
-        get() = _editShopItemFinished
+//    private val _editShopItemFinished = MutableLiveData<Boolean>()
+//    val editShopItemFinished: LiveData<Boolean>
+//        get() = _editShopItemFinished
 
     fun editShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
@@ -62,8 +62,8 @@ class ShopItemViewModel : ViewModel() {
                     )
                 )
             }
+            finishWork()
         }
-        finishWork()
     }
 
     private fun parseName(inputName: String?): String {

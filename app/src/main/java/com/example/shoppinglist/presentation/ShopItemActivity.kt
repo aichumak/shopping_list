@@ -3,6 +3,8 @@ package com.example.shoppinglist.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +18,7 @@ class ShopItemActivity : AppCompatActivity() {
     private lateinit var viewModel: ShopItemViewModel
     lateinit var tilName: TextInputLayout
     lateinit var tilCount: TextInputLayout
-    lateinit var etName: EditText
+    private lateinit var etName: EditText
     lateinit var etCount: EditText
     lateinit var saveButton: Button
     private var screenMode = MODE_UNKNOWN
@@ -28,21 +30,80 @@ class ShopItemActivity : AppCompatActivity() {
         parseIntent()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         initViews()
+        addTextChangedListeners()
+        launchRightMode()
+        observeViewModel()
+    }
 
+    private fun observeViewModel() {
+        viewModel.errorInputCount.observe(this) {
+            tilCount.error = if (it) {
+                getString(R.string.error_input_count)
+            } else {
+                null
+            }
+        }
+
+        viewModel.errorInputName.observe(this) {
+            tilName.error = if (it) {
+                getString(R.string.error_input_name)
+            } else {
+                null
+            }
+        }
+
+        viewModel.shouldCloseScreen.observe(this) {
+            finish()
+        }
+    }
+
+    private fun launchRightMode() {
         when (screenMode) {
             MODE_EDIT -> launchEditMode()
             MODE_ADD -> launchAddMode()
         }
     }
 
-    private fun launchEditMode() {
+    private fun addTextChangedListeners() {
+        etName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
 
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetErrorInputName()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
+
+        etCount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetErrorInputCount()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
+    }
+
+    private fun launchEditMode() {
+        viewModel.getShopItem(shopItemId)
+        viewModel.shopItem.observe(this) {
+            etName.setText(it.name)
+            etCount.setText(it.count.toString())
+        }
+        saveButton.setOnClickListener {
+            viewModel.editShopItem(etName.text?.toString(), etCount.text?.toString())
+        }
     }
 
     private fun launchAddMode() {
         saveButton.setOnClickListener {
-            viewModel.addShopItem(etName.text.toString(), etCount.text.toString())
-            true
+            viewModel.addShopItem(etName.text?.toString(), etCount.text?.toString())
         }
     }
 
@@ -63,7 +124,7 @@ class ShopItemActivity : AppCompatActivity() {
             if (!intent.hasExtra(EXTRA_SHOP_ITEM_ID)) {
                 throw RuntimeException("Param screen mode is absent")
             }
-            shopItemId == intent.getIntExtra(EXTRA_SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
+            shopItemId = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
         }
     }
 
