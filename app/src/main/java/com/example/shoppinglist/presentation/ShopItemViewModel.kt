@@ -45,10 +45,6 @@ class ShopItemViewModel : ViewModel() {
         }
     }
 
-//    private val _editShopItemFinished = MutableLiveData<Boolean>()
-//    val editShopItemFinished: LiveData<Boolean>
-//        get() = _editShopItemFinished
-
     fun editShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
