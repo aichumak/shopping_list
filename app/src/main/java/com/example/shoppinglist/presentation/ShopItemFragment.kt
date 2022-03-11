@@ -1,5 +1,6 @@
 package com.example.shoppinglist.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,15 +16,24 @@ import com.example.shoppinglist.domain.ShopItem
 import com.google.android.material.textfield.TextInputLayout
 
 class ShopItemFragment : Fragment() {
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
     private lateinit var viewModel: ShopItemViewModel
     lateinit var tilName: TextInputLayout
     lateinit var tilCount: TextInputLayout
     private lateinit var etName: EditText
     lateinit var etCount: EditText
     lateinit var saveButton: Button
-
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnEditingFinishedListener) {
+            onEditingFinishedListener = context
+        } else {
+            throw RuntimeException("Activity must implement OnEditingFinishedListener")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +75,8 @@ class ShopItemFragment : Fragment() {
         }
 
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-            activity?.onBackPressed()
+            //(activity as MainActivity).onEditingFinished()
+            onEditingFinishedListener.onEditingFinished()
         }
     }
 
@@ -119,48 +130,20 @@ class ShopItemFragment : Fragment() {
         }
     }
 
-//    private fun parseIntent() {
-//
-//        if (!intent.hasExtra(EXTRA_SCREEN_MODE)) {
-//            throw RuntimeException("Param screen mode is absent")
-//        }
-//
-//        val mode = intent.getStringExtra(EXTRA_SCREEN_MODE)
-//        if (mode != MODE_ADD && mode != MODE_EDIT) {
-//            throw RuntimeException("Unknown screen mode $mode")
-//        }
-//
-//        screenMode = mode
-//
-//        if (screenMode == MODE_EDIT) {
-//            if (!intent.hasExtra(EXTRA_SHOP_ITEM_ID)) {
-//                throw RuntimeException("Param screen mode is absent")
-//            }
-//            shopItemId = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
-//        }
-//    }
-
     private fun parseParams() {
-//        if (screenMode != MODE_EDIT && screenMode != MODE_ADD) {
-//            throw RuntimeException("Param screen mode is absent: $screenMode")
-//        }
-//        if (screenMode == MODE_EDIT && shopItemId == ShopItem.UNDEFINED_ID) {
-//            throw RuntimeException("Param shop item ID is absent")
-//        }
-
         val args = requireArguments()
 
         if (!args.containsKey(SCREEN_MODE)) {
             throw RuntimeException("Param screen mode is absent")
         }
 
-        val mode = args.getString(SCREEN_MODE)
+        screenMode = args.getString(SCREEN_MODE).toString()
 
-        if (mode != MODE_ADD && mode != MODE_EDIT) {
-            throw RuntimeException("Unknown screen mode $mode")
+        if (screenMode != MODE_ADD && screenMode != MODE_EDIT) {
+            throw RuntimeException("Unknown screen mode $screenMode")
         }
 
-        if (mode == MODE_EDIT) {
+        if (screenMode == MODE_EDIT) {
             if (!args.containsKey(SHOP_ITEM_ID)) {
                 throw RuntimeException("Param shop item ID is absent")
             }
@@ -174,6 +157,10 @@ class ShopItemFragment : Fragment() {
         etName = view.findViewById(R.id.et_name)
         etCount = view.findViewById(R.id.et_count)
         saveButton = view.findViewById(R.id.save_button)
+    }
+
+    interface OnEditingFinishedListener {
+        fun onEditingFinished()
     }
 
     companion object {
