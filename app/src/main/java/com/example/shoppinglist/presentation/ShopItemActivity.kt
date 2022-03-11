@@ -9,13 +9,6 @@ import com.example.shoppinglist.domain.ShopItem
 
 class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
-//    private lateinit var viewModel: ShopItemViewModel
-//    lateinit var tilName: TextInputLayout
-//    lateinit var tilCount: TextInputLayout
-//    private lateinit var etName: EditText
-//    lateinit var etCount: EditText
-//    lateinit var saveButton: Button
-
     private var screenMode = MODE_UNKNOWN
     private var shopItemId = ShopItem.UNDEFINED_ID
 
@@ -82,8 +75,7 @@ class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinished
             return intent
         }
     }
-
-    //    private fun observeViewModel() {
+//    private fun observeViewModel() {
 //        viewModel.errorInputCount.observe(this) {
 //            tilCount.error = if (it) {
 //                getString(R.string.error_input_count)
